@@ -4,9 +4,9 @@ namespace CC_Logistics
 {
     public static class Program
     {
-        static readonly WebSocketServer Server = new("ws://127.0.0.1:8181/");
+        static readonly WebSocketServer Server = new("ws://0.0.0.0:8181/");
         static IWebSocketConnection Socket;
-        static async Task Main(string[] args)
+        static void Main(string[] args)
         {
             Server.Start(socket =>
             {
@@ -16,7 +16,10 @@ namespace CC_Logistics
                 socket.OnMessage = OnMessage;
             });
 
-            await Task.Run(() => Console.ReadKey(intercept: true));
+            while (true)
+            {
+                
+            }
         }
 
         static void OnOpen()
