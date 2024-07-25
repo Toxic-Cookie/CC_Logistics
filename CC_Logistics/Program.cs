@@ -4,7 +4,8 @@ namespace CC_Logistics
 {
     public static class Program
     {
-        static readonly WebSocketServer Server = new("ws://0.0.0.0:8181/");
+        // 8080 for dev. 8181 for prod.
+        static readonly WebSocketServer Server = new("ws://0.0.0.0:8080/");
         static IWebSocketConnection Socket;
         static void Main(string[] args)
         {
