@@ -236,21 +236,16 @@ end
 local function OnRednetReceive()
     while true do
         local id, message = rednet.receive()
-		if (message == nil) then
-			goto OnRednetReceive_Continue
-		end
 
-        if (message.request.body.target ~= os.getComputerID()) then
-            return
-        end
+        --if (message.request.body.target ~= os.getComputerID()) then
+        --    return
+        --end
 
-        if (turtle ~= nil) then
-            if (message.request.header == Request.Dispense_Items) then
-                Dispense_Items(message.request.body.item, message.request.body.quantity)
-            end
-        end
-
-		::OnRednetReceive_Continue::
+        --if (turtle ~= nil) then
+        --    if (message.request.header == Request.Dispense_Items) then
+        --        Dispense_Items(message.request.body.item, message.request.body.quantity)
+        --    end
+        --end
     end
 end
 function OnWSReceive()

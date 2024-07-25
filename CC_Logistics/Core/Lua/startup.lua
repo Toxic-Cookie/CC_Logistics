@@ -3,7 +3,7 @@ local Version = "1.0.0"
 function Download(url, file)
 	local content = http.get(url).readAll()
 	if (not content) then
-	  error("Could not connect to website")
+		error("Could not connect to website")
 	end
 	local f = fs.open(file, "w+")
 	f.write(content)
