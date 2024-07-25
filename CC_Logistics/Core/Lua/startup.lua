@@ -1,7 +1,7 @@
 ﻿local Version = "1.0.0"
 
 if (not fs.exists("basalt.lua")) then
-    wget run https://basalt.madefor.cc/install.lua release latest.lua
+    shell.run("wget run https://basalt.madefor.cc/install.lua release latest.lua")
 end
 if (fs.exists("startup.lua")) then
     shell.run("delete startup.lua")
