@@ -7,9 +7,9 @@ if (fs.exists("startup.lua")) then
 	shell.run("delete startup.lua")
 end
 shell.run("wget https://raw.githubusercontent.com/Toxic-Cookie/CC_Logistics/master/CC_Logistics/Core/Lua/startup.lua startup.lua")
-if (fs.exists("CC_Logistics")) then
-	shell.run("delete CC_Logistics")
+if (fs.exists("CC_Logistics.lua")) then
+	shell.run("delete CC_Logistics.lua")
 end
 shell.run("wget https://raw.githubusercontent.com/Toxic-Cookie/CC_Logistics/master/CC_Logistics/Core/Lua/CC_Logistics.lua CC_Logistics.lua")
 
-shell.run("CC_Logistics")
+shell.run("CC_Logistics.lua")
