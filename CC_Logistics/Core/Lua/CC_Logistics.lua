@@ -236,6 +236,10 @@ end
 local function OnRednetReceive()
     while true do
         local id, message = rednet.receive()
+		if (message == nil) then
+			goto OnRednetReceive_Continue
+		end
+
         if (message.request.body.target ~= os.getComputerID()) then
             return
         end
@@ -245,6 +249,8 @@ local function OnRednetReceive()
                 Dispense_Items(message.request.body.item, message.request.body.quantity)
             end
         end
+
+		::OnRednetReceive_Continue::
     end
 end
 function OnWSReceive()
@@ -456,7 +462,7 @@ local function Init()
 
     Init_Networking()
     Init_Other()
-	Init_WS()
+	--Init_WS()
 
     Basalt.autoUpdate()
 end
@@ -468,9 +474,8 @@ function Init_Networking()
         :execute(OnRednetReceive)
         :hide()
 
-	for i, computerID in pairs(GetNetworkedComputers()) do
-
-	end
+	--for i, computerID in PairsByKeys(GetNetworkedComputers()) do
+	--end
 end
 function Init_Other()
     GUI:addProgram()
