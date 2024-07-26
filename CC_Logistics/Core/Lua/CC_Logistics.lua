@@ -506,11 +506,6 @@ function PromoteToHost()
 end
 function Init_Networking()
     Modem = peripheral.find("modem", rednet.open)
-	if (Modem == nil) then
-		return
-	end
-
-	rednet.host("CC_Logistics", os.getComputerLabel())
 	if (GetNetworkedHost() == nil) then
 		rednet.host("CC_Logistics_Host", os.getComputerLabel())
 		Init_WS()
