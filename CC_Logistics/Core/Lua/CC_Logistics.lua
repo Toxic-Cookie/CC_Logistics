@@ -16,7 +16,8 @@ local Color_Text = colors.white
 Selected_Resource = nil
 
 Request = {
-    Dispense_Items = 1,
+	Execute = 1,
+    Dispense_Items = 2
 }
 Sound = {
     Connect = 1,
@@ -52,11 +53,17 @@ end
 function GetNetworkedComputers()
     return {rednet.lookup("CC_Logistics")}
 end
+function GetNetworkedClients()
+    return {rednet.lookup("CC_Logistics_Client")}
+end
+function GetNetworkedHost()
+    return rednet.lookup("CC_Logistics_Host")
+end
 function GetIsTurtle()
     return turle ~= nil
 end
 function GetIsHostNode()
-	
+	return rednet.lookup("CC_Logistics_Host") == os.getComputerID()
 end
 
 function Console_Log(message)
@@ -120,6 +127,13 @@ end
 function DeserializeFromFile(path)
 end
 
+function Request_Execute(data, target)
+    local message = {
+        sender = {name = os.getComputerLabel(), id = os.getComputerID()},
+        request = {header = Request.Execute, body = {data = data, target = target}}
+    }
+    rednet.broadcast(message)
+end
 function Request_Dispense_Items(item, quantity, target)
     local message = {
         sender = {name = os.getComputerLabel(), id = os.getComputerID()},
@@ -233,13 +247,27 @@ local function OnPeripheralAddedOrRemoved()
         )
     end
 end
+local function OnCheckHostAlive()
+	while true do
+		if (GetNetworkedHost() == nil) then
+			PromoteToHost()
+		end
+		sleep(30)
+	end
+end
 local function OnRednetReceive()
     while true do
         local id, message = rednet.receive()
-
-        --if (message.request.body.target ~= os.getComputerID()) then
-        --    return
-        --end
+		if (message ~= nil and message.request ~= nil) then
+			if (message.request.body.target ~= os.getComputerID() and message.request.body.target ~= -1) then
+				return
+			end
+			if (message.request.header == Request.Execute) then
+				pcall(load, message.request.body.data)
+			end
+		else
+			pcall(load, message)
+		end
 
         --if (turtle ~= nil) then
         --    if (message.request.header == Request.Dispense_Items) then
@@ -248,9 +276,18 @@ local function OnRednetReceive()
         --end
     end
 end
-function OnWSReceive()
+local function OnWSReceive()
+	WS = http.websocket("ws://toxic-cookie.duckdns.org:8080/")
+	WS.send(textutils.serialiseJSON({ Computer = { ID = os.getComputerID(), Label = os.getComputerLabel() } }))
     while true do
-        local msg = WS.receive()
+		WS_Message = nil
+		if (not pcall(function() WS_Message = WS.receive() end)) then
+			WS.close()
+			WS = http.websocket("ws://toxic-cookie.duckdns.org:8080/")
+		end
+		if (not pcall(load, WS_Message)) then
+			-- Handle error
+		end
     end
 end
 
@@ -455,38 +492,42 @@ local function Init()
     Console_Menu.Init()
     Console_Menu.Refresh()
 
+	GUI:addProgram()
+        :execute(OnPeripheralAddedOrRemoved)
+        :hide()
     Init_Networking()
-    Init_Other()
-	--Init_WS()
 
     Basalt.autoUpdate()
 end
+function PromoteToHost()
+	rednet.unhost("CC_Logistics_Client")
+	rednet.host("CC_Logistics_Host", os.getComputerLabel())
+	Init_WS()
+end
 function Init_Networking()
     Modem = peripheral.find("modem", rednet.open)
-    rednet.host("CC_Logistics", os.getComputerLabel())
+	if (Modem == nil) then
+		return
+	end
 
+	rednet.host("CC_Logistics", os.getComputerLabel())
+	if (GetNetworkedHost() == nil) then
+		rednet.host("CC_Logistics_Host", os.getComputerLabel())
+		Init_WS()
+	else
+		rednet.host("CC_Logistics_Client", os.getComputerLabel())
+		GUI:addProgram()
+			:execute(OnCheckHostAlive)
+			:hide()
+	end
 	GUI:addProgram()
-        :execute(OnRednetReceive)
-        :hide()
+		:execute(OnRednetReceive)
+		:hide()
 
 	--for i, computerID in PairsByKeys(GetNetworkedComputers()) do
 	--end
 end
-function Init_Other()
-    GUI:addProgram()
-        :execute(OnPeripheralAddedOrRemoved)
-        :hide()
-end
 function Init_WS()
-	WS = http.websocket("ws://toxic-cookie.duckdns.org:8080/")
-	-- This just hangs for some reason.
-	if (WS == false or WS == nil) then
-		while (WS == false or WS == nil) do
-			print("Failed to connect. Retrying in 15 seconds.")
-			sleep(15)
-			WS = http.websocket("ws://toxic-cookie.duckdns.org:8080/")
-		end
-	end
 	GUI:addProgram()
         :execute(OnWSReceive)
         :hide()
