@@ -1,5 +1,6 @@
 ﻿using Fleck;
-using System.Text.Json;
+using Newtonsoft;
+using Newtonsoft.Json;
 
 namespace CC_Logistics;
 
@@ -36,8 +37,8 @@ public static class Program
     {
         //Socket.Send(message);
         Console.WriteLine($"Got message: {message}");
-        var c = JsonSerializer.Deserialize<Computer>(message);
-        Console.WriteLine($"Computer ID: {c.ID}");
+        var c = JsonConvert.DeserializeObject<Message<Computer>>(message);
+        Console.WriteLine($"Computer ID: {c.Data.ID} Label: {c.Data.Label}");
         Socket.Send($"print('hiii')");
     }
 }

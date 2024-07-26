@@ -278,13 +278,13 @@ local function OnRednetReceive()
 end
 local function OnWSReceive()
 	WS = http.websocket("ws://toxic-cookie.duckdns.org:8080/")
-	WS.send(textutils.serialiseJSON({ Computer = { ID = os.getComputerID(), Label = os.getComputerLabel() } }))
+	WS.send(textutils.serialiseJSON({ Data = { ID = os.getComputerID(), Label = os.getComputerLabel() } }))
     while true do
 		WS_Message = nil
 		if (not pcall(function() WS_Message = WS.receive() end)) then
 			WS.close()
 			WS = http.websocket("ws://toxic-cookie.duckdns.org:8080/")
-			WS.send(textutils.serialiseJSON({ Computer = { ID = os.getComputerID(), Label = os.getComputerLabel() } }))
+			pcall(WS.send, textutils.serialiseJSON({ Data = { ID = os.getComputerID(), Label = os.getComputerLabel() } }))
 		end
 		if (not pcall(load, WS_Message)) then
 			-- Handle error
