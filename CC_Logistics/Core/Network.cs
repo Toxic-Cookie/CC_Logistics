@@ -35,8 +35,7 @@ public static class Network
     }
     static async void HandleOnOpen()
     {
-        await Socket.Send("\"WS.send('hello')\"");
-        await Socket.Send("\"WS.send(os.getComputerID())\"");
+        await Socket.Send("WS.send(os.getComputerID())");
         //await Socket.Send("\"WS.send(textutils.serialiseJSON({ ID = os.getComputerID(), Label = os.getComputerLabel() }))\"");
         //var message = JsonConvert.DeserializeObject<Message>(await GetNextMessage());
         //Computers.Add(new Computer { ID = message.ID, Label = message.Label });

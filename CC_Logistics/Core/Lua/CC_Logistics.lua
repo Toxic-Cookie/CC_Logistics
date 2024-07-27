@@ -286,7 +286,8 @@ function OnWSReceive()
 			WS = http.websocket("ws://toxic-cookie.duckdns.org:8080/")
 			--pcall(function() WS.send(textutils.serialiseJSON({ Data = { ID = os.getComputerID(), Label = os.getComputerLabel() } })) end)
 		end
-		load(WS_Message, nil, "t", _ENV)
+		if (not pcall(load(WS_Message, nil, "t", _ENV))) then
+		end
     end
 end
 
