@@ -35,11 +35,10 @@ public static class Network
     }
     static async void HandleOnOpen()
     {
-        await Socket.Send("\"WS.send('test')\"");
-        //await Socket.Send("WS.send(textutils.serialiseJSON({ ID = os.getComputerID(), Label = os.getComputerLabel() }))");
-        //var message = JsonConvert.DeserializeObject<Message>(await GetNextMessage());
-        //Computers.Add(new Computer { ID = message.ID, Label = message.Label });
-        //Console.WriteLine($"Connected to computer {message.Label} with ID {message.ID}.");
+        await Socket.Send("\"WS.send(textutils.serialiseJSON({ ID = os.getComputerID(), Label = os.getComputerLabel() }))\"");
+        var message = JsonConvert.DeserializeObject<Message>(await GetNextMessage());
+        Computers.Add(new Computer { ID = message.ID, Label = message.Label });
+        Console.WriteLine($"Connected to computer {message.Label} with ID {message.ID}.");
     }
 
     public static event Action OnSocketClosed;
