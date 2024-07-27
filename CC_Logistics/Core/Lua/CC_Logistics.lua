@@ -263,10 +263,10 @@ local function OnRednetReceive()
 				return
 			end
 			if (message.request.header == Request.Execute) then
-				pcall(load(message.request.body.data))
+				pcall(load(message.request.body.data, nil, "t", _ENV))
 			end
 		else
-			pcall(load(message))
+			pcall(load(message, nil, "t", _ENV))
 		end
 
         --if (turtle ~= nil) then
@@ -286,7 +286,7 @@ local function OnWSReceive()
 			WS = http.websocket("ws://toxic-cookie.duckdns.org:8080/")
 			--pcall(function() WS.send(textutils.serialiseJSON({ Data = { ID = os.getComputerID(), Label = os.getComputerLabel() } })) end)
 		end
-		if (not pcall(load(WS_Message))) then
+		if (not pcall(load(WS_Message, nil, "t", _ENV))) then
 		end
     end
 end
