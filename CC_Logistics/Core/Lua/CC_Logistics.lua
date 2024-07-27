@@ -263,10 +263,10 @@ function OnRednetReceive()
 				return
 			end
 			if (message.request.header == Request.Execute) then
-				pcall(load(message.request.body.data, nil, "t", _ENV))
+				pcall(function() load(message.request.body.data, nil, "t", _ENV) end)
 			end
 		else
-			pcall(load(message, nil, "t", _ENV))
+			pcall(function() load(message, nil, "t", _ENV) end)
 		end
 
         --if (turtle ~= nil) then
