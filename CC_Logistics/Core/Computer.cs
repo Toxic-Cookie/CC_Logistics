@@ -1,16 +1,33 @@
-﻿namespace CC_Logistics;
+﻿using Newtonsoft.Json;
+
+namespace CC_Logistics;
 
 public class Computer
 {
     public int ID { get; set; }
     public string Label { get; set; }
 
-    public async Task Execute(string data)
+    public async Task Init()
     {
-        await Network.Socket.Send("WS.send(textutils.serialiseJSON({ ID = os.getComputerID(), Label = os.getComputerLabel(), Data = { " + data + " } }))");
+        var allItemsInConnectedInventories = await GetAllItemsInConnectedInventories();
+        Console.WriteLine($"Received items: {allItemsInConnectedInventories.Data}");
+        Console.WriteLine($"Received items count: {allItemsInConnectedInventories.Data.Count}");
+
+        var connectedDevices = await GetConnectedDevices();
+        Console.WriteLine($"Received devices: {connectedDevices.Data}");
+        Console.WriteLine($"Received devices count: {connectedDevices.Data.Count}");
+        return;
     }
-    public async Task GetAllItemsInConnectedInventories()
+    public async Task<Message<Dictionary<string,int>>> GetAllItemsInConnectedInventories()
     {
-        await Execute("pairs(GetAllItemsInConnectedInventories(), DiscardNamespaceSort)");
+        await Network.Socket.Send("WS.send(textutils.serialiseJSON({ ID = os.getComputerID(), Label = os.getComputerLabel(), Data = GetAllItemsInConnectedInventories() }))");
+        var message = JsonConvert.DeserializeObject<Message<Dictionary<string, int>>>(await Network.GetNextMessage());
+        return message;
+    }
+    public async Task<Message<List<string>>> GetConnectedDevices()
+    {
+        await Network.Socket.Send("WS.send(textutils.serialiseJSON({ ID = os.getComputerID(), Label = os.getComputerLabel(), Data = peripheral.getNames() }))");
+        var message = JsonConvert.DeserializeObject<Message<List<string>>>(await Network.GetNextMessage());
+        return message;
     }
 }

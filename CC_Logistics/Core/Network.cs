@@ -1,5 +1,6 @@
 ﻿using Fleck;
 using Newtonsoft.Json;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CC_Logistics;
 
@@ -35,11 +36,13 @@ public static class Network
     }
     static async void HandleOnOpen()
     {
-        //await Socket.Send("WS.send(os.getComputerID())");
         await Socket.Send("WS.send(textutils.serialiseJSON({ ID = os.getComputerID(), Label = os.getComputerLabel() }))");
         var message = JsonConvert.DeserializeObject<Message>(await GetNextMessage());
-        Computers.Add(new Computer { ID = message.ID, Label = message.Label });
+        var computer = new Computer { ID = message.ID, Label = message.Label };
+        Computers.Add(computer);
+        
         Console.WriteLine($"Connected to computer {message.Label} with ID {message.ID}.");
+        await computer.Init();
     }
 
     public static event Action OnSocketClosed;
