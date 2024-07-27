@@ -282,17 +282,11 @@ local function OnWSReceive()
     while true do
 		WS_Message = nil
 		if (not pcall(function() WS_Message = WS.receive() end)) then
-			Basalt.debug("X: " .. WS_Message)
 			pcall(function() WS.close() end)
 			WS = http.websocket("ws://toxic-cookie.duckdns.org:8080/")
 			--pcall(function() WS.send(textutils.serialiseJSON({ Data = { ID = os.getComputerID(), Label = os.getComputerLabel() } })) end)
-		else
-			Basalt.debug("Y: " .. WS_Message)
 		end
 		if (not pcall(load, WS_Message)) then
-			Basalt.debug("Z: " .. WS_Message)
-		else
-			Basalt.debug("W: " .. WS_Message)
 		end
     end
 end
