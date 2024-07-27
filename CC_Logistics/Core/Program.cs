@@ -1,5 +1,4 @@
 ﻿using Fleck;
-using Newtonsoft;
 using Newtonsoft.Json;
 
 namespace CC_Logistics;
@@ -33,12 +32,12 @@ public static class Program
     {
         Console.WriteLine("Closed!");
     }
-    static void OnMessage(string message)
+    static async void OnMessage(string message)
     {
         //Socket.Send(message);
         Console.WriteLine($"Got message: {message}");
         var c = JsonConvert.DeserializeObject<Message<Computer>>(message);
         Console.WriteLine($"Computer ID: {c.Data.ID} Label: {c.Data.Label}");
-        Socket.Send($"print('hiii')");
+        await Socket.Send($"print('hiii')");
     }
 }
