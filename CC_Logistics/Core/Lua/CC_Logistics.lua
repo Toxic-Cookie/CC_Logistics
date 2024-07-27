@@ -1,4 +1,4 @@
-local Version = "1.0.0"
+Version = "1.0.0"
 
 ----- #region DOCS -----
 -- Items can only be dispensed at turtles.
@@ -8,10 +8,10 @@ local Version = "1.0.0"
 ----- #endregion /DOCS -----
 
 ----- #region VARIABLES -----
-local Color_Primary = colors.purple
-local Color_Secondary = colors.magenta
-local Color_Tertiary = colors.pink
-local Color_Text = colors.white
+Color_Primary = colors.purple
+Color_Secondary = colors.magenta
+Color_Tertiary = colors.pink
+Color_Text = colors.white
 
 Selected_Resource = nil
 
@@ -38,25 +38,6 @@ Reserved_Items = {
 ----- #endregion /VARIABLES -----
 
 ----- #region GENERAL METHODS -----
-function MergeTable()
-	-- Create a new table to store the merged key-value pairs
-	local mergedTable = {}
-	-- Iterate over the keys in _G
-	for k, v in pairs(_G) do
-    	-- Check if the key also exists in _ENV
-    	if _ENV[k] then
-    	    -- Add the key-value pair to mergedTable only if it doesn't already exist
-    	    if not mergedTable[k] then
-    	        mergedTable[k] = v
-    	    end
-    	else
-    	    -- If the key does not exist in _ENV, add it directly to mergedTable
-    	    mergedTable[k] = v
-    	end
-	end
-	return mergedTable
-end
-
 function GetConnectedDevices()
     return peripheral.getNames()
 end
@@ -250,7 +231,7 @@ end
 ----- #endregion /GENERAL METHODS -----
 
 ----- #region EVENTS -----
-local function OnPeripheralAddedOrRemoved()
+function OnPeripheralAddedOrRemoved()
     while true do
         parallel.waitForAny(
             function()
@@ -266,7 +247,7 @@ local function OnPeripheralAddedOrRemoved()
         )
     end
 end
-local function OnCheckHostAlive()
+function OnCheckHostAlive()
 	while true do
 		if (GetNetworkedHost() == nil) then
 			PromoteToHost()
@@ -274,7 +255,7 @@ local function OnCheckHostAlive()
 		sleep(30)
 	end
 end
-local function OnRednetReceive()
+function OnRednetReceive()
     while true do
         local id, message = rednet.receive()
 		if (message ~= nil and message.request ~= nil) then
@@ -282,10 +263,10 @@ local function OnRednetReceive()
 				return
 			end
 			if (message.request.header == Request.Execute) then
-				pcall(load(message.request.body.data, nil, "t", MergeTable()))
+				pcall(load(message.request.body.data, nil, "t", _ENV))
 			end
 		else
-			pcall(load(message, nil, "t", MergeTable()))
+			pcall(load(message, nil, "t", _ENV))
 		end
 
         --if (turtle ~= nil) then
@@ -295,7 +276,7 @@ local function OnRednetReceive()
         --end
     end
 end
-local function OnWSReceive()
+function OnWSReceive()
 	WS = http.websocket("ws://toxic-cookie.duckdns.org:8080/")
 	--pcall(function() WS.send(textutils.serialiseJSON({ Data = { ID = os.getComputerID(), Label = os.getComputerLabel() } })) end)
     while true do
@@ -305,7 +286,7 @@ local function OnWSReceive()
 			WS = http.websocket("ws://toxic-cookie.duckdns.org:8080/")
 			--pcall(function() WS.send(textutils.serialiseJSON({ Data = { ID = os.getComputerID(), Label = os.getComputerLabel() } })) end)
 		end
-		if (not pcall(load(WS_Message, nil, "t", MergeTable()))) then
+		if (not pcall(load(WS_Message, nil, "t", _ENV))) then
 		end
     end
 end
@@ -466,7 +447,7 @@ Console_Menu = {
     end
 }
 
-local function OpenMenu(menu_name)
+function OpenMenu(menu_name)
     for k,v in pairs(Menus) do
         if (menu_name ~= k) then
             v:hide()
@@ -475,7 +456,7 @@ local function OpenMenu(menu_name)
         end
     end
 end
-local function Init()
+function Init()
     Basalt = require("basalt")
     GUI = Basalt.createFrame():setTheme({FrameBG = Color_Primary, FrameFG = Color_Secondary})
 
