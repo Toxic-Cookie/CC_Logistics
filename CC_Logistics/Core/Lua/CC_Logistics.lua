@@ -266,11 +266,8 @@ function OnRednetReceive()
 				pcall(load(message.request.body.data, nil, "t", _ENV))
 			end
 		else
-			if (message ~= nil) then
-				local loadedData = load(message, nil, "t", _ENV)
-				if (loadedData ~= nil and type(loadedData) == "function") then
-					pcall(loadedData)
-				end
+			if (message ~= nil and (type(message) == "string" or type(message) == "function")) then
+				pcall(load(message, nil, "t", _ENV))
 			end
 		end
 
