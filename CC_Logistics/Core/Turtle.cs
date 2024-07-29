@@ -12,10 +12,16 @@ public class Turtle : Computer
     public async Task Craft()
     {
         Console.WriteLine("Crafting.");
-        Dictionary<string, int> val = new() {
-            { "minecraft:oak_log", 1}
+        Dictionary<int, string> val = new() {
+            { 1, "minecraft:oak_log" }
         };
-        await Network.Socket.Send($"OnCraftRequested({JsonConvert.SerializeObject(val)}, 1)");
+        //List<int, string> val2 = new() {
+        //    { 1, "minecraft:oak_log" },
+        //    { 4, "minecraft:oak_log" }
+        //};
+        Console.WriteLine(JsonConvert.SerializeObject(val));
+        //Console.WriteLine(JsonConvert.SerializeObject(val2));
+        await Network.Socket.Send($"OnCraftRequested(textutils.unserialiseJSON('{JsonConvert.SerializeObject(val)}'), 1)");
         //await Network.Socket.Send("WS.send(textutils.serialiseJSON({ Data = { ID = os.getComputerID(), Label = os.getComputerLabel() } }))");
     }
 }
