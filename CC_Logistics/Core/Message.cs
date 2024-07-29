@@ -1,11 +1,11 @@
 ﻿namespace CC_Logistics;
 
-public class Message
+public struct Message
 {
     public int ID { get; set; }
     public string Label { get; set; }
 }
-public class Message<T>
+public struct Message<T>
 {
     public int ID { get; set; }
     public string Label { get; set; }

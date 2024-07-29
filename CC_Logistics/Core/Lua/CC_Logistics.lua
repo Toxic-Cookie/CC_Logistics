@@ -65,6 +65,20 @@ end
 function GetIsHostNode()
 	return rednet.lookup("CC_Logistics_Host") == os.getComputerID()
 end
+function TablesAreEqual(t1, t2)
+    local keys = {}
+    for k in pairs(t1) do
+        table.insert(keys, k)
+    end
+    table.sort(keys)
+
+    for i, k in ipairs(keys) do
+        if t1[k] ~= t2[k] then
+            return false
+        end
+    end
+    return true
+end
 
 function Console_Log(message)
 end
@@ -120,11 +134,6 @@ function TryParseSide(side)
 end
 function ResolveNameFromSide(side) -- convert "top" to "minecraft:chest_19" somehow
     peripheral.getNames() -- doesn't seem like there's a good way of doing this so we'll grab a random item and shove it in the last slot then test which one has only that item in that slot then map it
-end
-
-function SerializeToFile(data, path)
-end
-function DeserializeFromFile(path)
 end
 
 function Request_Execute(data, target)
@@ -293,6 +302,45 @@ function OnWSReceive()
 			end
 		end
     end
+end
+function OnCraftRequested(ingredientPattern, amountToCraft)
+	local remap = {1, 2, 3, 5, 6, 7, 9, 10, 11}
+
+	local assignedCacheStorage
+    for _, inventory in pairs(GetConnectedInventories()) do
+		if (inventory.size() > 26) then
+			local lastItem = inventory.getItemDetail(27)
+			if (lastItem ~= nil and tonumber(lastItem.displayName) == os.getComputerID()) then
+				assignedCacheStorage = inventory
+				break
+			end
+		end
+    end
+
+	for item_name, pattern_slot in pairs(ingredientPattern) do
+		local transferredItems = 0
+    	for _, inventory in pairs(GetConnectedInventories()) do
+			if peripheral.getName(inventory) ~= "front" and peripheral.getName(inventory) ~= "top" then
+				for slot, item in pairs(inventory.list()) do
+					if (item.name == item_name) then
+						transferredItems = transferredItems + assignedCacheStorage.pullItems(peripheral.getName(inventory), slot, amountToCraft - transferredItems)
+					end
+					if (transferredItems >= amountToCraft) then
+						turtle.select(remap[pattern_slot])
+						turtle.suck(amountToCraft)
+						goto next_pattern_slot
+					end
+				end
+			end
+    	end
+		::next_pattern_slot::
+	end
+
+	turtle.craft()
+	for i = 1, 16 do
+		turtle.select(i)
+		turtle.drop()
+	end
 end
 
 ----- #endregion /EVENTS -----

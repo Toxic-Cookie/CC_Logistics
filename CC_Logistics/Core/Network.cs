@@ -1,6 +1,5 @@
 ﻿using Fleck;
 using Newtonsoft.Json;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CC_Logistics;
 
@@ -36,13 +35,20 @@ public static class Network
     }
     static async void HandleOnOpen()
     {
-        await Socket.Send("WS.send(textutils.serialiseJSON({ ID = os.getComputerID(), Label = os.getComputerLabel() }))");
-        var message = JsonConvert.DeserializeObject<Message>(await GetNextMessage());
-        var computer = new Computer { ID = message.ID, Label = message.Label };
-        Computers.Add(computer);
-        
-        Console.WriteLine($"Connected to computer {message.Label} with ID {message.ID}.");
-        await computer.Init();
+        await Socket.Send("WS.send(textutils.serialiseJSON({ ID = os.getComputerID(), Label = os.getComputerLabel(), Data = turtle == nil }))");
+        var message = JsonConvert.DeserializeObject<Message<bool>>(await GetNextMessage());
+        if (message.Data)
+        {
+            Console.WriteLine($"Connected to computer {message.Label} with ID {message.ID}.");
+            var computer = new Computer { ID = message.ID, Label = message.Label };
+            await computer.Init();
+        }
+        else
+        {
+            Console.WriteLine($"Connected to turtle {message.Label} with ID {message.ID}.");
+            var turtle = new Turtle { ID = message.ID, Label = message.Label };
+            await turtle.Init();
+        }
     }
 
     public static event Action OnSocketClosed;
@@ -56,9 +62,7 @@ public static class Network
     static void OnMessage(string message)
     {
         Console.WriteLine($"Received message: {message}");
-        //Socket.Send(message);
-        //var c = JsonConvert.DeserializeObject<Message>(message);
-        //await Socket.Send($"print('hiii')");
+
         OnSocketMessage?.Invoke(message);
     }
     
@@ -69,7 +73,32 @@ public static class Network
         tcs.Task.ContinueWith(_ => OnSocketMessage -= tcs.SetResult);
         return tcs.Task;
     }
-
-    public static readonly Dictionary<string, int> Items = [];
-    public static readonly List<Computer> Computers = [];
+    public static Task<string> GetNextMessage(Predicate<Message> predicate)
+    {
+        var tcs = new TaskCompletionSource<string>();
+        OnSocketMessage += message =>
+        {
+            var deserializedMessage = JsonConvert.DeserializeObject<Message>(message);
+            if (predicate(deserializedMessage))
+            {
+                tcs.SetResult(message);
+            }
+        };
+        tcs.Task.ContinueWith(_ => OnSocketMessage -= tcs.SetResult);
+        return tcs.Task;
+    }
+    public static Task<string> GetNextMessage<T>(Predicate<Message<T>> predicate)
+    {
+        var tcs = new TaskCompletionSource<string>();
+        OnSocketMessage += message =>
+        {
+            var deserializedMessage = JsonConvert.DeserializeObject<Message<T>>(message);
+            if (predicate(deserializedMessage))
+            {
+                tcs.SetResult(message);
+            }
+        };
+        tcs.Task.ContinueWith(_ => OnSocketMessage -= tcs.SetResult);
+        return tcs.Task;
+    }
 }

@@ -7,7 +7,7 @@ public class Computer
     public int ID { get; set; }
     public string Label { get; set; }
 
-    public async Task Init()
+    public virtual async Task Init()
     {
         var allItemsInConnectedInventories = await GetAllItemsInConnectedInventories();
         Console.WriteLine($"Received items: {allItemsInConnectedInventories.Data}");
@@ -16,7 +16,6 @@ public class Computer
         var connectedDevices = await GetConnectedDevices();
         Console.WriteLine($"Received devices: {connectedDevices.Data}");
         Console.WriteLine($"Received devices count: {connectedDevices.Data.Count}");
-        return;
     }
     public async Task<Message<Dictionary<string,int>>> GetAllItemsInConnectedInventories()
     {
