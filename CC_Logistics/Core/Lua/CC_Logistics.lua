@@ -308,7 +308,7 @@ function OnCraftRequested(ingredientPattern, amountToCraft)
 
 	local assignedCacheStorage
     for _, inventory in pairs(GetConnectedInventories()) do
-		if (inventory.size() > 26) then
+		if (inventory.size() > 26 and peripheral.getName(inventory) ~= "front" and peripheral.getName(inventory) ~= "top") then
 			local lastItem = inventory.getItemDetail(27)
 			if (lastItem ~= nil and tonumber(lastItem.displayName) == os.getComputerID()) then
 				assignedCacheStorage = inventory
@@ -320,14 +320,14 @@ function OnCraftRequested(ingredientPattern, amountToCraft)
 	for item_name, pattern_slot in pairs(ingredientPattern) do
 		local transferredItems = 0
     	for _, inventory in pairs(GetConnectedInventories()) do
-			if peripheral.getName(inventory) ~= "front" and peripheral.getName(inventory) ~= "top" then
+			if (peripheral.getName(inventory) ~= "front" and peripheral.getName(inventory) ~= "top") then
 				for slot, item in pairs(inventory.list()) do
 					if (item.name == item_name) then
 						transferredItems = transferredItems + assignedCacheStorage.pullItems(peripheral.getName(inventory), slot, amountToCraft - transferredItems)
 					end
 					if (transferredItems >= amountToCraft) then
 						turtle.select(remap[pattern_slot])
-						turtle.suck(amountToCraft)
+						turtle.suckUp(amountToCraft)
 						goto next_pattern_slot
 					end
 				end

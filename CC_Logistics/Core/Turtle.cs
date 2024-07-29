@@ -6,10 +6,12 @@ public class Turtle : Computer
     public override async Task Init()
     {
         await base.Init();
+        Console.WriteLine("Turtle initialized.");
         await Craft();
     }
     public async Task Craft()
     {
+        Console.WriteLine("Crafting.");
         Dictionary<string, int> val = new() {
             { "minecraft:oak_log", 1}
         };
