@@ -318,6 +318,7 @@ function OnCraftRequested(ingredientPattern, amountToCraft)
     end
 
 	for pattern_slot, item_name in pairs(ingredientPattern) do
+		pattern_slot = tonumber(pattern_slot)
 		local transferredItems = 0
     	for _, inventory in pairs(GetConnectedInventories()) do
 			if (peripheral.getName(inventory) ~= "front" and peripheral.getName(inventory) ~= "top") then
