@@ -8,15 +8,11 @@ public interface IRecipe
     /// <summary>
     /// The input ingredients required to craft the product.
     /// </summary>
-    public ICollection<string> Ingedients { get; set; }
+    public Dictionary<string, int> Ingredients { get; set; }
     /// <summary>
     /// The product that is crafted.
     /// </summary>
     public ICollection<string> Products { get; set; }
-    /// <summary>
-    /// Whether the product should be kept in stock.
-    /// </summary>
-    public bool KeepStock { get; set; }
     /// <summary>
     /// The amount of the product to keep in stock.
     /// </summary>
@@ -29,4 +25,8 @@ public interface IRecipe
     /// The maximum amount of product that can be crafted in a single batch.
     /// </summary>
     public int MaxBatchSize { get; set; }
+    /// <summary>
+    /// Whether to allow similar ingredients to be used in place of the required ingredients.
+    /// </summary>
+    public bool AllowSimilarIngedients { get; set; }
 }

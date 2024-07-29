@@ -6,22 +6,29 @@ public class Turtle : Computer
     public override async Task Init()
     {
         await base.Init();
-        Console.WriteLine("Turtle initialized.");
-        await Craft();
+        //await Craft(new CraftingRecipe() { Pattern = new Dictionary<int, string>() { { 1, "minecraft:oak_planks" }, { 4, "minecraft:oak_planks" } } }, 1);
+        await Craft(new CraftingRecipe() 
+        { 
+            Pattern = new Dictionary<int, string>() { 
+                { 1, "minecraft:cobblestone" },
+                { 2, "minecraft:cobblestone" },
+                { 3, "minecraft:cobblestone" },
+                { 4, "minecraft:cobblestone" },
+                { 6, "minecraft:cobblestone" },
+                { 7, "minecraft:cobblestone" },
+                { 8, "minecraft:cobblestone" },
+                { 9, "minecraft:cobblestone" },
+            },
+            Products = ["minecraft:furnace"]
+        }, 1);
     }
-    public async Task Craft()
+    public async Task Craft(CraftingRecipe recipe, int amount)
     {
-        Console.WriteLine("Crafting.");
-        Dictionary<int, string> val = new() {
-            { 1, "minecraft:oak_log" }
-        };
-        //List<int, string> val2 = new() {
-        //    { 1, "minecraft:oak_log" },
-        //    { 4, "minecraft:oak_log" }
-        //};
-        Console.WriteLine(JsonConvert.SerializeObject(val));
-        //Console.WriteLine(JsonConvert.SerializeObject(val2));
-        await Network.Socket.Send($"OnCraftRequested(textutils.unserialiseJSON('{JsonConvert.SerializeObject(val)}'), 1)");
-        //await Network.Socket.Send("WS.send(textutils.serialiseJSON({ Data = { ID = os.getComputerID(), Label = os.getComputerLabel() } }))");
+        var guid = Guid.NewGuid();
+        Console.WriteLine($"Crafting {amount} of {recipe.Products.First()}.");
+        await Network.Socket.Send("GUI:addProgram():execute(function() OnCraftRequested(textutils.unserialiseJSON('" + JsonConvert.SerializeObject(recipe.Pattern) +"'), " + amount 
+            + ") end):hide():onDone(function() WS.send(textutils.serialiseJSON({ ID = os.getComputerID(), Label = os.getComputerLabel(), Data = '" + guid + "' })) end)");
+        var message = JsonConvert.DeserializeObject<Message<string>>(await Network.GetNextMessage<Guid>(x => x.Data == guid ));
+        Console.WriteLine($"Crafted {amount} of {recipe.Products.First()}.");
     }
 }
